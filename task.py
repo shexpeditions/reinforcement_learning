@@ -29,8 +29,10 @@ class Task():
     def get_reward(self):
         """Uses current pose of sim to return reward."""
         reward = 0.5
-        # encourage positive difference between the z coordinates of 
+        
+        # encourage for positive velocity
         reward += np.tanh(self.sim.v[2])
+        # encourage to fly towards
         dz = self.target_pos[2] - self.sim.pose[2]
         reward += 0.5 * np.exp(-(dz**2)/ 25.0)
                 
@@ -41,21 +43,19 @@ class Task():
         reward = 0
         pose_all = []
 
-        counter = 1
-        #speed = 500.0
-        #print([speed] * 4)
+        counter = 1        
         speed_const = rotor_speeds * 4
         #print(rotor_speeds)
         for _ in range(self.action_repeat):            
             done = self.sim.next_timestep(speed_const) # update the sim pose and velocities
             reward += self.get_reward()
             if done == True:
-                reward -= 0.2
+                reward -= 0.2 # crashing receives a small penalty
                 #print('crashed')
 
             if self.sim.pose[2] >= (self.target_pos[2] - 0.05):
                 done = True
-                reward += 0.1
+                reward += 0.1 # succeding receives a small reward
                 #print('target reached')
             #print(self.sim.pose)
             pose_all.append(self.sim.pose)
