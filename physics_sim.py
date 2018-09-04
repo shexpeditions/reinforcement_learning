@@ -26,6 +26,7 @@ def body_to_earth_frame(ii, jj, kk):
 class PhysicsSim():
     def __init__(self, init_pose=None, init_velocities=None, init_angle_velocities=None, runtime=5.):
         self.init_pose = init_pose
+        print(init_pose)
         self.init_velocities = init_velocities
         self.init_angle_velocities = init_angle_velocities
         self.runtime = runtime
@@ -53,7 +54,7 @@ class PhysicsSim():
 
     def reset(self):
         self.time = 0.0
-        self.pose = np.array([0.0, 0.0, 10.0, 0.0, 0.0, 0.0]) if self.init_pose is None else np.copy(self.init_pose)
+        self.pose = np.array([0.0, 0.0, 10.0, 0.0, 0.0, 0.0]) if self.init_pose is None else np.copy(self.init_pose)        
         self.v = np.array([0.0, 0.0, 0.0]) if self.init_velocities is None else np.copy(self.init_velocities)
         self.angular_v = np.array([0.0, 0.0, 0.0]) if self.init_angle_velocities is None else np.copy(self.init_angle_velocities)
         self.linear_accel = np.array([0.0, 0.0, 0.0])
@@ -131,7 +132,10 @@ class PhysicsSim():
         angles = self.pose[3:] + self.angular_v * self.dt + 0.5 * self.angular_accels * self.angular_accels * self.dt ** 2
         angles = (angles + 2 * np.pi) % (2 * np.pi)
         self.angular_v = self.angular_v + self.angular_accels * self.dt
-
+        # print('pos')
+        # print(position)
+        # print('vel')
+        # print(self.v)
         new_positions = []
         for ii in range(3):
             if position[ii] <= self.lower_bounds[ii]:
@@ -141,8 +145,10 @@ class PhysicsSim():
                 new_positions.append(self.upper_bounds[ii])
                 self.done = True
             else:
-                new_positions.append(position[ii])
+                new_positions.append(position[ii]) 
 
+        # print('new pos')
+        # print(new_positions)
         self.pose = np.array(new_positions + list(angles))
         self.time += self.dt
         if self.time > self.runtime:

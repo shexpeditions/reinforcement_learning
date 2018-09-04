@@ -1,6 +1,6 @@
 
 
-from keras import layers, models, optimizers
+from keras import layers, models, optimizers, regularizers
 from keras import backend as K
 
 class Actor:
@@ -32,9 +32,12 @@ class Actor:
         states = layers.Input(shape=(self.state_size,), name='states')
 
         # Add hidden layers
-        net = layers.Dense(units=32, activation='relu')(states)
-        net = layers.Dense(units=64, activation='relu')(net)
-        net = layers.Dense(units=32, activation='relu')(net)
+        net = layers.Dense(units=32, activation='relu', kernel_initializer='glorot_normal')(states)
+        net = layers.BatchNormalization()(net)
+        net = layers.Dense(units=64, activation='relu', kernel_initializer='glorot_normal')(net)
+        net = layers.BatchNormalization()(net)
+        net = layers.Dense(units=128, activation='relu', kernel_initializer='glorot_normal')(net)
+        net = layers.BatchNormalization()(net)
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
@@ -56,7 +59,7 @@ class Actor:
         # Incorporate any additional losses here (e.g. from regularizers)
 
         # Define optimizer and training function
-        optimizer = optimizers.Adam()
+        optimizer = optimizers.Adam(0.0001)
         updates_op = optimizer.get_updates(params=self.model.trainable_weights, loss=loss)
         self.train_fn = K.function(
             inputs=[self.model.input, action_gradients, K.learning_phase()],
