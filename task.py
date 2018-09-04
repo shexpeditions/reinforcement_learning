@@ -28,7 +28,7 @@ class Task():
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
-        reward = 0.0
+        reward = 0.5
         # encourage positive difference between the z coordinates of 
         reward += np.tanh(self.sim.v[2])
         dz = self.target_pos[2] - self.sim.pose[2]
@@ -51,12 +51,12 @@ class Task():
             reward += self.get_reward()
             if done == True:
                 reward -= 0.2
-                print('crashed')
+                #print('crashed')
 
             if self.sim.pose[2] >= (self.target_pos[2] - 0.05):
                 done = True
                 reward += 0.1
-                print('target reached')
+                #print('target reached')
             #print(self.sim.pose)
             pose_all.append(self.sim.pose)
             counter += 1
